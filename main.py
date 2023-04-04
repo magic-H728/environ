@@ -20,6 +20,12 @@ def after_request(response):
     return response
 
 
+# /接口
+@app.route('/', methods=['GET'])
+def index():
+    return 'Hello World!'
+
+
 # 上传图片接口
 @app.route('/uploadImg', methods=['POST'])
 def uploadImg():
