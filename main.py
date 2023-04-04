@@ -1,7 +1,7 @@
 # 导入flask框架
 import json
 import time
-
+import requests
 import pymysql
 from flask import Flask, request, send_file
 
@@ -29,45 +29,41 @@ def index():
 # 上传图片接口
 @app.route('/uploadImg', methods=['POST'])
 def uploadImg():
-    # 获取图片
-    img = request.files.get('img')
-    # filename为年+月+日+时+分+秒+图片名
-    img.filename = str(time.strftime("%Y%m%d%H%M%S", time.localtime())) + '.jpg'
-    print(img.filename)
-    # 保存图片
-    img.save('./environ/img/' + img.filename)
-    # 拼接图片URL
-    # imgURL = 'http://environ.magic-H.top/getImg?' + img.filename
-
-    imgURL = 'http://150.158.18.74:4999/getImg?' + img.filename
-    # 返回图片URL
+    # 将请求转发到另一个服务器
+    url = 'http://150.158.18.74:4999/uploadImg'
+    files = {'img': request.files.get('img')}
+    imgURL = requests.post(url, files=files).text
+    print(imgURL)
     return imgURL
 
 
 # 获取图片接口 /environ/img?159123456789.jpg
-@app.route('/getImg', methods=['GET'])
-def getImg():
-    # 获取?所有参数
-    args = request.args
-    # 判断参数是否为空
-    if args is None:
-        return None
-    # 获取图片名
-    imgName = str(request.args).split("'")[1]
-    # 使用flask的send_file方法发送图片
-    return send_file('./environ/img/' + imgName)
+# @app.route('/getImg', methods=['GET'])
+# def getImg():
+#     # 将请求转发到另一个服务器
+#     url = 'http://150.158.18.74:4999/getImg'
+#     args = request.args
+#     img = requests.get(url, params=args).content
+#     return img
+
+# # 获取?所有参数
+# args = request.args
+# # 判断参数是否为空
+# if args is None:
+#     return None
+# # 获取图片名
+# imgName = str(request.args).split("'")[1]
+# # 使用flask的send_file方法发送图片
+# return send_file('./environ/img/' + imgName)
 
 
 # 数据上传接口
 @app.route('/post', methods=['POST'])
 def post():
+    # 将请求转发到另一个服务器
+    url = 'http://150.158.18.74:4999/post'
     data = request.get_json()
-
-    SQLData = {}
-    SQLData['id'] = data['id']
-    SQLData['special_info'] = data
-    print(SQLData)
-    insertDB(SQLData)
+    requests.post(url, json=data)
     return "Yes"
 
 
@@ -123,4 +119,4 @@ def selectDB():
 
 # 启动flask程序
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=80, debug=False)
+    app.run(host='0.0.0.0', port=4999, debug=False)
