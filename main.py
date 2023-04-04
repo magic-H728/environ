@@ -123,4 +123,4 @@ def selectDB():
 
 # 启动flask程序
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=4999, debug=False)
+    app.run(host='0.0.0.0', port=80, debug=False)
